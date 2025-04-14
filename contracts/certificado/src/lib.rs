@@ -5,6 +5,8 @@ use soroban_sdk::{contract, contractimpl, Env, String, Map, symbol_short};
 /// Definimos la clave de almacenamiento como una constante para evitar errores tipográficos
 const DOCUMENTS_KEY: soroban_sdk::Symbol = symbol_short!("DOCUMENTS");
 const HISTORIAL_KEY: soroban_sdk::Symbol = symbol_short!("HISTORIAL");
+const RESPALDOS_KEY: soroban_sdk::Symbol = symbol_short!("RESPALDOS");
+
 
 #[contract]
 pub struct DocumentosContract;
@@ -40,7 +42,7 @@ impl DocumentosContract {
         // Guardamos el mapa actualizado en el almacenamiento persistente
         env.storage().persistent().set(&DOCUMENTS_KEY, &documentos);
     }
-    
+ //metodo para obtener todos los documentos   
     pub fn obtener_documento(env: Env, id_documento: i32) -> Option<(String, String, u64)> {
         let documentos: Map<i32, (String, String, u64)> = env
             .storage()
@@ -50,7 +52,7 @@ impl DocumentosContract {
     
         documentos.get(id_documento)
     }
-
+//metodo para realizar una consulta al historial   /// Añade una entrada al historial de un documento.
     pub fn consulta_historial(env: Env, id_historial: i32, fecha: u64, resultado: String) {
         let mut historial: Map<i32, (u64, String)> = env
             .storage()
@@ -65,7 +67,7 @@ impl DocumentosContract {
         historial.set(id_historial, (fecha, resultado));
         env.storage().persistent().set(&HISTORIAL_KEY, &historial);
     }
-    // --- Obtener una entrada del historial por ID ---
+    //  --- Obtener una entrada del historial por ID ---
     pub fn obtener_historial(env: Env, id_historial: i32) -> Option<(u64, String)> {
         let historial: Map<i32, (u64, String)> = env
             .storage()
@@ -75,4 +77,38 @@ impl DocumentosContract {
 
         historial.get(id_historial)
     }
+// --- Realizar un respaldo de un documento --- 
+    /// Añade un respaldo de un documento al registro.
+    pub fn realizar_respaldo(
+        env: Env,
+        id_respaldo: i32,
+        fecha: u64,
+        ubicacion: String,
+        autor: String,
+    ) {
+        let mut respaldos: Map<i32, (u64, String, String)> = env
+            .storage()
+            .persistent()
+            .get(&RESPALDOS_KEY)
+            .unwrap_or(Map::new(&env));
+    
+        if respaldos.contains_key(id_respaldo) {
+            panic!("Respaldo con ese ID ya existe");
+        }  
+        respaldos.set(id_respaldo, (fecha, ubicacion, autor));
+        env.storage().persistent().set(&RESPALDOS_KEY, &respaldos);
+    }
+ // --- Obtener un respaldo por ID ---
+    /// Devuelve un respaldo de un documento por su ID.
+    /// Devuelve `None` si no existe.   
+    pub fn consultar_respaldo(env: Env, id_respaldo: i32) -> Option<(u64, String, String)> {
+        let respaldos: Map<i32, (u64, String, String)> = env
+            .storage()
+            .persistent()
+            .get(&RESPALDOS_KEY)
+            .unwrap_or(Map::new(&env));
+    
+        respaldos.get(id_respaldo)
+    }
+    
 }

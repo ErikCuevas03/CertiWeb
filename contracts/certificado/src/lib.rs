@@ -4,6 +4,7 @@ use soroban_sdk::{contract, contractimpl, Env, String, Map, symbol_short};
 
 /// Definimos la clave de almacenamiento como una constante para evitar errores tipográficos
 const DOCUMENTS_KEY: soroban_sdk::Symbol = symbol_short!("DOCUMENTS");
+const HISTORIAL_KEY: soroban_sdk::Symbol = symbol_short!("HISTORIAL");
 
 #[contract]
 pub struct DocumentosContract;
@@ -49,5 +50,29 @@ impl DocumentosContract {
     
         documentos.get(id_documento)
     }
-    
+
+    pub fn consulta_historial(env: Env, id_historial: i32, fecha: u64, resultado: String) {
+        let mut historial: Map<i32, (u64, String)> = env
+            .storage()
+            .persistent()
+            .get(&HISTORIAL_KEY)
+            .unwrap_or(Map::new(&env));
+
+        if historial.contains_key(id_historial) {
+            panic!("Historial con el mismo ID ya existe");
+        }
+
+        historial.set(id_historial, (fecha, resultado));
+        env.storage().persistent().set(&HISTORIAL_KEY, &historial);
+    }
+    // --- Obtener una entrada del historial por ID ---
+    pub fn obtener_historial(env: Env, id_historial: i32) -> Option<(u64, String)> {
+        let historial: Map<i32, (u64, String)> = env
+            .storage()
+            .persistent()
+            .get(&HISTORIAL_KEY)
+            .unwrap_or(Map::new(&env));
+
+        historial.get(id_historial)
+    }
 }

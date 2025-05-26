@@ -1,6 +1,6 @@
 #![no_std] // No usamos la biblioteca estándar de Rust
 
-use soroban_sdk::{contract, contractimpl, Env, String, Map, symbol_short, Vec};  // Asegúrate de importar Vec
+use soroban_sdk::{contract, contractimpl, Env, String, Map, symbol_short};
 
 
 
@@ -354,3 +354,6 @@ pub fn verificar_integracion(env: Env, id_integracion: i32) -> Option<String> {
 }
 
 }
+
+#[cfg(test)]
+mod test;

@@ -229,7 +229,9 @@ export default {
 
       } catch (error) {
         console.error("Error al registrar documento:", error);
-        alert("Error al registrar el documento.");
+         alert("Error al registrar el documento.");
+        
+
       }
     }
   }

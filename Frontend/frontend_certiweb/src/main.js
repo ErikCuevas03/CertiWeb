@@ -8,7 +8,6 @@ createApp(App).mount('#app')
 //   render: h => h(App),
 // }).$mount('#app')
 
-const HORIZON_URL = 'https://horizon-testnet.stellar.org'; // o futurenet o public
 
 
 
